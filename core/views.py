@@ -21,7 +21,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 def load_from_csv():
-    file = '/home/trinitykleckner/Me/pennapps/B4UGo/data/EV_Charging_Stations.csv'
+    file = 'data/EV_Charging_Stations.csv'
     keys = ('Station Name', 'New Georeferenced Column')
     records = []
 
