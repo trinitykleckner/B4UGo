@@ -3,6 +3,7 @@ from django.shortcuts import render
 import csv
 import folium
 from folium.plugins import FastMarkerCluster
+import requests as r
 
 # Create your views here.
 def index(request):
@@ -38,4 +39,36 @@ def load_from_csv():
 
     return records
 
-load_from_csv()
+mapbox_api_token = 'pk.eyJ1IjoidGtoYXYiLCJhIjoiY2xtYmRmcHh0MTA1MzN0czVoOTR2YTRucSJ9.AVSquDkpzPKthwGBk0sByg'
+session_id = '0ac69c5a-92d6-4f18-8a7a-36c99d067a9a'
+
+def get_categories():
+    url = 'https://api.mapbox.com/search/searchbox/v1/list/category?&access_token='+mapbox_api_token
+    categories = [category['canonical_id'] for category in r.get(url).json()['listItems']]
+    categories.remove('gun_store')
+    return categories
+
+def category_search(category_id, long, lat):
+    url = 'https://api.mapbox.com/search/searchbox/v1/category/'+category_id+'limit=25&proximity='+str(long)+','+str(lat)+'&access_token='+mapbox_api_token
+    print(url)
+    results = r.get(url).json()
+    print(results)
+    pass
+
+def search(search_obj_id):
+    url = 'https://api.mapbox.com/search/searchbox/v1/retrieve/'+search_obj_id+'?session_token='+session_id+'&access_token='+mapbox_api_token
+
+    req = r.get(url)
+    print(req.json())
+    print(req.json()['features'])
+
+def get_suggestions(input, long, lat):
+    coords = str(long)+','+str(lat)
+    url = 'https://api.mapbox.com/search/searchbox/v1/suggest?q='+input+'&language=en&proximity='+coords+'&session_token='+session_id+'&access_token='+mapbox_api_token
+    suggestions = r.get(url).json()['suggestions']
+    # print(suggestions)
+    return suggestions[0]['mapbox_id']
+
+
+id = get_suggestions('foo', -75.3043287827, 40.00583331)
+search(id)
